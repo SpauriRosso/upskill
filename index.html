@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zone01 Profile Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'gradient': 'gradient 8s linear infinite',
+                    },
+                    keyframes: {
+                        gradient: {
+                            '0%, 100%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950 min-h-screen text-white overflow-x-hidden">
+<!-- Login Page -->
+<div id="loginPage" class="min-h-screen flex items-center justify-center p-4 glow-effect">
+    <div class="glass-card p-8 w-full max-w-md fade-in">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
+                Zone01 Profile
+            </h1>
+            <p class="text-gray-300 mt-2">Sign in to view your dashboard</p>
+        </div>
+
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Username or Email</label>
+                <input type="text" id="loginInput" required
+                       class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none text-white placeholder-gray-400"
+                       placeholder="Enter username or email">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                <input type="password" id="passwordInput" required
+                       class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none text-white placeholder-gray-400"
+                       placeholder="Enter password">
+            </div>
+
+            <button type="submit" id="loginButton"
+                    class="liquid-button w-full bg-gradient-to-r from-purple-500 to-pink-500 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105">
+                Sign In
+            </button>
+
+            <div id="loginError" class="hidden text-red-400 text-sm text-center p-3 bg-red-900/20 rounded-lg border border-red-500/20">
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Profile Dashboard -->
+<div id="profilePage" class="hidden min-h-screen">
+    <!-- Header -->
+    <header class="glass-card border-0 rounded-none sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
+                        IoT Profile Dashboard
+                    </h1>
+                    <!-- System Status Indicator -->
+                    <div class="ml-4 flex items-center space-x-3 text-xs">
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse mr-1"></div>
+                            <span class="text-green-400">SYSTEM ONLINE</span>
+                        </div>
+                        <div class="text-sky-300" id="timestamp">
+                            <span class="font-mono">T+00:00:00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Connection Status -->
+                    <div class="text-xs text-sky-300 hidden sm:block">
+                        <span class="font-mono">CONNECTION: SECURE</span>
+                        <span class="inline-block w-2 h-2 bg-sky-400 rounded-full animate-pulse ml-1"></span>
+                    </div>
+                    <button id="logoutButton"
+                            class="liquid-button bg-red-500/20 hover:bg-red-500/30 px-4 py-2 rounded-lg border border-red-500/50 transition-colors">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="flex justify-center items-center h-64">
+        <div class="loading-spinner w-16 h-16 border-4 border-sky-500 border-t-transparent rounded-full"></div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="mainContent" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 iot-grid-bg">
+        <!-- Top Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 stagger-fade-in">
+            <!-- User Info Card -->
+            <div class="glass-card p-6 fade-in">
+                <h3 class="text-lg font-semibold mb-4 text-sky-300">User Information</h3>
+                <div id="userInfo" class="space-y-2">
+                    <p><span class="text-gray-400">ID:</span> <span id="userId" class="text-white"></span></p>
+                    <p><span class="text-gray-400">Login:</span> <span id="userLogin" class="text-white"></span></p>
+                </div>
+            </div>
+
+            <!-- Total XP Card -->
+            <div class="glass-card p-6 fade-in glow-effect">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-sky-300">Total XP</h3>
+                    <span class="tech-label">REAL-TIME</span>
+                </div>
+                <div class="text-3xl font-bold text-white pulse" id="totalXP">0</div>
+                <p class="text-gray-400 text-sm mt-2 data-indicator">Experience Points Earned</p>
+                <div class="data-flow-line absolute bottom-0 left-0 right-0"></div>
+            </div>
+
+            <!-- Audit Stats Card -->
+            <div class="glass-card p-6 fade-in">
+                <h3 class="text-lg font-semibold mb-4 text-sky-300">Audit Statistics</h3>
+                <div class="space-y-2">
+                    <p><span class="text-gray-400">Audit Ratio:</span> <span id="auditRatioDisplay" class="text-cyan-400 font-semibold">0.00</span></p>
+                    <p><span class="text-gray-400">Audits Done:</span> <span id="auditsDoneCount" class="text-white">0</span></p>
+                    <p><span class="text-gray-400">Audits Received:</span> <span id="auditsReceivedCount" class="text-white">0</span></p>
+                </div>
+            </div>
+
+            <!-- Piscine Stats Card -->
+            <div class="glass-card p-6 fade-in">
+                <h3 class="text-lg font-semibold mb-4 text-sky-300">Piscine Stats</h3>
+                <div class="space-y-2">
+                    <p><span class="text-gray-400">Piscine Go:</span> <span id="piscineGoXp" class="text-white">0</span></p>
+                    <p><span class="text-gray-400">Piscine JS:</span> <span id="piscineJsXp" class="text-white">0</span></p>
+                    <p><span class="text-gray-400">Cursus:</span> <span id="cursusXp" class="text-white">0</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Timeline -->
+        <div class="glass-card p-6 mb-8 fade-in">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold text-sky-300">Activity Timeline</h3>
+                <div class="flex items-center space-x-2">
+                    <span class="tech-label">HISTORICAL</span>
+                    <span class="tech-label">DATA POINTS</span>
+                </div>
+            </div>
+            <p class="text-gray-400 mb-4 data-indicator">Your GitHub-like activity over time</p>
+            <div id="activityHeatmap" class="activity-heatmap bg-white/5 p-4 rounded-lg overflow-x-auto">
+                <!-- Activity cells will be generated here -->
+                <div class="flex justify-center items-center h-32 text-gray-400">
+                    Loading activity data...
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8 stagger-fade-in">
+            <!-- XP by Project Chart -->
+            <div class="glass-card p-6 fade-in">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold text-sky-300">XP by Project</h3>
+                    <span class="tech-label">ANALYTICS</span>
+                </div>
+                <div class="relative chart-container">
+                    <div class="absolute top-2 right-2 flex items-center space-x-2 z-10">
+                        <div class="text-xs text-sky-300 font-mono">DATA STREAM</div>
+                        <div class="w-2 h-2 bg-sky-400 rounded-full animate-pulse"></div>
+                    </div>
+                    <svg id="xpByProjectChart" width="100%" height="380" class="bg-white/5 rounded-lg"></svg>
+                </div>
+            </div>
+
+            <!-- Skills Chart -->
+            <div class="glass-card p-6 fade-in">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold text-sky-300">Skills Overview</h3>
+                    <span class="tech-label">PROFICIENCY METRICS</span>
+                </div>
+                <div class="relative chart-container">
+                    <div class="absolute top-2 left-2 flex items-center space-x-2 z-10">
+                        <div class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+                        <div class="text-xs text-cyan-300 font-mono">SKILL ANALYSIS</div>
+                    </div>
+                    <svg id="skillsChart" width="100%" height="400" class="bg-white/5 rounded-lg"></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Piscine Progress -->
+        <div class="glass-card p-6 mb-8 fade-in">
+            <h3 class="text-xl font-semibold mb-6 text-sky-300">Piscine Progress</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Piscine Go Progress -->
+                <div>
+                    <h4 class="text-lg font-medium mb-3 text-white">Piscine Go</h4>
+                    <div class="bg-white/5 rounded-lg p-4">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-400">Progress</span>
+                            <span id="piscineGoProgress" class="text-sky-300">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                            <div id="piscineGoProgressBar" class="bg-gradient-to-r from-sky-500 to-blue-500 h-2.5 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <div id="piscineGoDetails" class="mt-4 text-sm text-gray-400">
+                            <!-- Piscine Go details will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Piscine JS Progress -->
+                <div>
+                    <h4 class="text-lg font-medium mb-3 text-white">Piscine JS</h4>
+                    <div class="bg-white/5 rounded-lg p-4">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-400">Progress</span>
+                            <span id="piscineJsProgress" class="text-sky-300">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                            <div id="piscineJsProgressBar" class="bg-gradient-to-r from-sky-500 to-blue-500 h-2.5 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <div id="piscineJsDetails" class="mt-4 text-sm text-gray-400">
+                            <!-- Piscine JS details will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Collaborators Section -->
+        <div class="glass-card p-6 mb-8 fade-in">
+            <h3 class="text-xl font-semibold mb-6 text-sky-300">Top Collaborators</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 stagger-fade-in" id="collaboratorsList">
+                <!-- Collaborators will be populated here -->
+                <div class="text-center text-gray-400">Loading collaborators...</div>
+            </div>
+        </div>
+
+        <!-- Recent XP Transactions Table -->
+        <div class="glass-card p-6 fade-in">
+            <h3 class="text-xl font-semibold mb-6 text-sky-300">Recent XP Transactions</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                    <tr class="border-b border-white/20">
+                        <th class="text-left py-3 px-4 text-gray-300">Project/Task</th>
+                        <th class="text-left py-3 px-4 text-gray-300">XP</th>
+                        <th class="text-left py-3 px-4 text-gray-300">Date</th>
+                    </tr>
+                    </thead>
+                    <tbody id="projectsTable" class="divide-y divide-white/10 stagger-fade-in"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script type="module" src="js/app.js"></script>
+
+</body>
+</html>
